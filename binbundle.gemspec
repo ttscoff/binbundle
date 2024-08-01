@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "lib/binbundle/version"
+require_relative 'lib/binbundle/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'binbundle'

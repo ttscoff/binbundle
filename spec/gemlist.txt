@@ -1,0 +1,7 @@
+gem install seachlink
+
+# Executables: searchlink
+sudo gem install searchlink --version '2.3.4'
+
+# Executables: searchlink
+gem install --user-install searchlink

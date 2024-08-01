@@ -28,12 +28,13 @@ module Binbundle
       puts "Installing gems from #{@file}"
 
       contents = IO.read(@file)
+      gem_list = GemList.new(contents, include_version: @include_version)
       lines = if @sudo
-                contents.sudo(include_version: @include_version)
+                gem_list.sudo
               elsif @user_install
-                contents.user_install(include_version: @include_version)
+                gem_list.user_install
               else
-                contents.normal_install(include_version: @include_version)
+                gem_list.normal_install
               end
 
       if @dry_run
@@ -43,63 +44,77 @@ module Binbundle
 
       `sudo echo -n ''` if @sudo
 
+      @errors = []
+
       lines.each do |cmd|
-        print cmd
+        spinner = TTY::Spinner.new("[:spinner] #{cmd} ...", hide_cursor: true, format: :dots_2)
+
+        spinner.auto_spin
 
         output = `/bin/bash -c '#{cmd}' 2>&1`
         result = $?.success?
 
         if result
-          puts ' ✅'
+          spinner.success
+          spinner.stop
         else
-          puts ' 😥'
-          puts output
+          spinner.error
+          spinner.stop
+          @errors << output
         end
       end
+
+      unless @errors.empty?
+        puts "ERRORS:"
+        puts @errors.join("\n")
+      end
+    end
+
+    def gem_command(gem, attrs)
+      ver = @include_version ? " -v '#{attrs[:version]}'" : ''
+      ui = @user_install ? '--user-install ' : ''
+      sudo = @sudo ? 'sudo ' : ''
+      "# Executables: #{attrs[:bins].join(', ')}\n#{sudo}gem install #{ui}#{gem}#{ver}"
     end
 
     def generate
       gems_with_bins = {}
 
-      @local_gems.map do |g, specs|
+      @local_gems.each do |g, specs|
         versions = specs.map { |spec| spec.version.to_s }
         bins = specs.map(&:executables)
         gems_with_bins[g] = { version: versions.max, bins: bins.sort.uniq }
       end
 
-      lines = []
-
-      gems_with_bins.each do |k, v|
-        ver = @include_version ? " -v '#{v[:version]}'" : ''
-        ui = @user_install ? '--user-install ' : ''
-        sudo = @sudo ? 'sudo ' : ''
-        lines << "# Executables: #{v[:bins].join(', ')}\n#{sudo}gem install #{ui}#{k}#{ver}"
-      end
-
-      output = lines.join("\n\n")
+      output = gems_with_bins.map { |gem, attrs| gem_command(gem, attrs) }.join("\n\n")
 
       if @dry_run
         puts output
       else
-        if File.exist?(@file)
-          res = Prompt.yn("#{@file} already exists, overwrite", default_response: false)
-          Process.exit 1 unless res
-        end
-
-        File.open(@file, 'w') do |f|
-          f.puts '#!/bin/bash'
-          f.puts
-          f.puts output
-        end
-
-        puts "Wrote list to #{@file}"
-
-        res = Prompt.yn('Make file executable', default_response: true)
-        if res
-          FileUtils.chmod 0o777, @file
-          puts 'Made file executable'
-        end
+        write_file(output)
       end
+    end
+
+    def write_file(output)
+      if File.exist?(@file)
+        res = Prompt.yn("#{@file} already exists, overwrite", default_response: false)
+        Process.exit 1 unless res
+      end
+
+      File.open(@file, 'w') do |f|
+        f.puts '#!/bin/bash'
+        f.puts
+        f.puts output
+      end
+
+      puts "Wrote list to #{@file}"
+
+      res = Prompt.yn('Make file executable', default_response: true)
+
+      return unless res
+
+      FileUtils.chmod 0o777, @file
+      puts 'Made file executable'
     end
   end
 end

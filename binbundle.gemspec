@@ -28,4 +28,6 @@ Gem::Specification.new do |spec|
   spec.bindir        = 'bin'
   spec.executables   = spec.files.grep(%r{\Abin/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
+
+  spec.add_runtime_dependency('tty-spinner', '~> 0.9')
 end

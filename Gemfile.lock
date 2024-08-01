@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     binbundle (1.0.5)
+      tty-spinner (~> 0.9)
 
 GEM
   remote: https://rubygems.org/
@@ -48,6 +49,9 @@ GEM
       parser (>= 3.3.1.0)
     ruby-progressbar (1.13.0)
     strscan (3.1.0)
+    tty-cursor (0.7.1)
+    tty-spinner (0.9.3)
+      tty-cursor (~> 0.7)
     unicode-display_width (2.5.0)
 
 PLATFORMS

@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require_relative '../lib/binbundle'
+
 options = {
   dry_run: false,
   file: 'Binfile',
@@ -48,6 +50,11 @@ optparse = OptionParser.new do |opts|
 end
 
 optparse.parse!
+
+if options[:sudo] && options[:user_install]
+  puts 'Error: --sudo and --user-install cannot be used together'
+  Process.exit 1
+end
 
 gb = Binbundle::GemBins.new(options)
 

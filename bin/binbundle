@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+options = {
+  dry_run: false,
+  file: 'Binfile',
+  include_version: true,
+  sudo: false,
+  user_install: false
+}
+
+optparse = OptionParser.new do |opts|
+  opts.banner = "Usage: #{File.basename(__FILE__)} [options]"
+
+  opts.on('--[no-]versions', 'Include version info in output (default true)') do |opt|
+    options[:include_version] = opt
+  end
+
+  opts.on('--dry-run', 'Output to STDOUT instead of file') do
+    options[:dry_run] = true
+  end
+
+  opts.on('-s', '--sudo', 'Install gems with sudo') do
+    options[:sudo] = true
+  end
+
+  opts.on('-u', '--user-install', 'Use --user-install to install gems') do
+    options[:user_install] = true
+  end
+
+  opts.on('-f', '--file FILE', 'Output to alternative filename (default Binfile)') do |opt|
+    options[:file] = opt
+  end
+
+  opts.on('-v', '--version', 'Display version') do
+    puts "#{File.basename(__FILE__)} v#{Binbundle::VERSION}"
+    Process.exit 0
+  end
+
+  opts.on('--install', 'Run bundle script') do
+    options[:install] = true
+  end
+
+  opts.on('-h', '--help', 'Display this screen') do
+    puts opts
+    exit
+  end
+end
+
+optparse.parse!
+
+gb = Binbundle::GemBins.new(options)
+
+options[:install] = true if ARGV.count.positive? && ARGV[0] =~ /^inst/
+
+if options[:install]
+  gb.install
+else
+  gb.generate
+end

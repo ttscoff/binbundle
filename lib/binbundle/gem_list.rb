@@ -5,8 +5,6 @@ module Binbundle
   class GemList
     attr_writer :include_version
 
-    attr_reader :gem_list
-
     def initialize(contents, include_version: true)
       @contents = contents
       @include_version = include_version
@@ -14,8 +12,12 @@ module Binbundle
     end
 
     def gem_list
-      @gem_list ||= @contents.split("\n").delete_if { |line| line.strip.empty? || line =~ /^#/ }.each_with_object([]) do |l, arr|
-        m = l.match(/^(?:sudo )?gem install (?:--user-install )?(?<gem>\S+)(?: (?:-v|--version) '(?<version>[0-9.]+)')?/)
+      @gem_list ||= @contents.split("\n")
+                             .delete_if { |line| line.strip.empty? || line =~ /^#/ }
+                             .each_with_object([]) do |l, arr|
+        rx = /^(?x)(?:sudo\s)?gem\sinstall\s(?:--user-install\s)?
+        (?<gem>\S+)(?:\s(?:-v|--version)\s'(?<version>[0-9.]+)')?/
+        m = l.match(rx)
         arr << { gem: m['gem'], version: m['version'] }
       end
     end

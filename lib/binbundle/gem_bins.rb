@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Binbundle
   # Main class
   class GemBins
@@ -47,12 +49,14 @@ module Binbundle
       @errors = []
 
       lines.each do |cmd|
+        # rubocop:disable Naming/VariableNumber
         spinner = TTY::Spinner.new("[:spinner] #{cmd} ...", hide_cursor: true, format: :dots_2)
+        # rubocop:enable Naming/VariableNumber
 
         spinner.auto_spin
 
         output = `/bin/bash -c '#{cmd}' 2>&1`
-        result = $?.success?
+        result = $CHILD_STATUS.success?
 
         if result
           spinner.success
@@ -64,10 +68,10 @@ module Binbundle
         end
       end
 
-      unless @errors.empty?
-        puts "ERRORS:"
-        puts @errors.join("\n")
-      end
+      return if @errors.empty?
+
+      puts 'ERRORS:'
+      puts @errors.join("\n")
     end
 
     def gem_command(gem, attrs)

@@ -1,18 +1,27 @@
 # frozen_string_literal: true
 
-require "bundler/gem_tasks"
-require "rspec/core/rake_task"
+require 'rake/clean'
+require 'rubygems'
+require 'rubygems/package_task'
+require 'rdoc/task'
+require 'bundler/gem_tasks'
+require 'rspec/core/rake_task'
+require 'rubocop/rake_task'
+
+desc 'Run test suite'
+task test: %i[rubocop spec]
+task package: %i[clobber build]
+
+RuboCop::RakeTask.new do |t|
+  t.formatters = ['progress']
+end
 
 RSpec::Core::RakeTask.new(:spec)
 
-require "rubocop/rake_task"
-
-RuboCop::RakeTask.new
-
-require 'rake/testtask'
-Rake::TestTask.new do |t|
-  t.libs << "test"
-  t.test_files = FileList['test/*_test.rb']
+Rake::RDocTask.new do |rd|
+  rd.main = 'README.rdoc'
+  rd.rdoc_files.include('README.rdoc', 'lib/**/*.rb', 'bin/**/*')
+  rd.title = 'binbundle'
 end
 
 desc 'Development version check'

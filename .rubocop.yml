@@ -1,5 +1,10 @@
+require:
+  - rubocop-rspec
+  - rubocop-rake
+
 AllCops:
   TargetRubyVersion: 2.6
+  # SuggestExtensions: false
 
 Style/StringLiterals:
   Enabled: true
@@ -11,3 +16,15 @@ Style/StringLiteralsInInterpolation:
 
 Layout/LineLength:
   Max: 120
+
+Metrics/MethodLength:
+  Max: 40
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Metrics/PerceivedComplexity:
+  Max: 30
+
+Metrics/AbcSize:
+  Max: 40

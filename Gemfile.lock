@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    binbundle (1.0.7)
+    binbundle (1.0.9)
       tty-spinner (~> 0.9)
 
 GEM

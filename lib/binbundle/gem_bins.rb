@@ -17,6 +17,26 @@ module Binbundle
       @local_gems = local_gems.delete_if { |_, specs| specs.delete_if { |spec| spec.executables.empty? }.empty? }
     end
 
+    def info(options)
+      unless File.exist?(@file) || options[:local]
+        puts "File #{@file} not found"
+        Process.exit 1
+      end
+
+      contents = if options[:local]
+                   bins_to_s
+                 else
+                   IO.read(@file)
+                 end
+
+      gem_list = GemList.new(contents, include_version: @include_version)
+      if options[:gem_for]
+        gem_list.gem_for_bin(options[:gem_for])
+      elsif options[:bin_for]
+        gem_list.bins_for_gem(options[:bin_for])
+      end
+    end
+
     def install
       unless File.exist?(@file)
         puts "File #{@file} not found"
@@ -81,7 +101,7 @@ module Binbundle
       "# Executables: #{attrs[:bins].join(', ')}\n#{sudo}gem install #{ui}#{gem}#{ver}"
     end
 
-    def generate
+    def bins_to_s
       gems_with_bins = {}
 
       @local_gems.each do |g, specs|
@@ -90,7 +110,11 @@ module Binbundle
         gems_with_bins[g] = { version: versions.max, bins: bins.sort.uniq }
       end
 
-      output = gems_with_bins.map { |gem, attrs| gem_command(gem, attrs) }.join("\n\n")
+      gems_with_bins.map { |gem, attrs| gem_command(gem, attrs) }.join("\n\n")
+    end
+
+    def generate
+      output = bins_to_s
 
       if @dry_run
         puts output

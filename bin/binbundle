@@ -4,9 +4,12 @@
 require_relative '../lib/binbundle'
 
 options = {
+  bin_for: nil,
   dry_run: false,
   file: 'Binfile',
+  gem_for: nil,
   include_version: true,
+  local: false,
   sudo: false,
   user_install: false
 }
@@ -14,12 +17,20 @@ options = {
 optparse = OptionParser.new do |opts|
   opts.banner = "Usage: #{File.basename(__FILE__)} [options] [bundle|install]"
 
-  opts.on('--[no-]versions', 'Include version info in output (default true)') do |opt|
+  opts.on('--dry-run', 'Output to STDOUT instead of file') do
+    options[:dry_run] = true
+  end
+
+  opts.on('-f', '--file FILE', 'Output to alternative filename (default Binfile)') do |opt|
+    options[:file] = opt
+  end
+
+  opts.on('--[no-]versions', 'Include version info in output or restore (default true)') do |opt|
     options[:include_version] = opt
   end
 
-  opts.on('--dry-run', 'Output to STDOUT instead of file') do
-    options[:dry_run] = true
+  opts.on('-l', '--local', 'Use installed gems instead of Binfile for gem_for and bins_for') do
+    options[:local] = true
   end
 
   opts.on('-s', '--sudo', 'Install gems with sudo') do
@@ -28,10 +39,6 @@ optparse = OptionParser.new do |opts|
 
   opts.on('-u', '--user-install', 'Use --user-install to install gems') do
     options[:user_install] = true
-  end
-
-  opts.on('-f', '--file FILE', 'Output to alternative filename (default Binfile)') do |opt|
-    options[:file] = opt
   end
 
   opts.on('-v', '--version', 'Display version') do
@@ -54,9 +61,23 @@ end
 
 gb = Binbundle::GemBins.new(options)
 
-options[:install] = true if ARGV.count.positive? && ARGV[0] =~ /^(inst|rest)/
+if ARGV.count.positive?
+  subcommand = ARGV.shift
+  params = ARGV.join(' ').sub(/ *for */, '')
 
-if options[:install]
+  case subcommand
+  when /^(inst|rest)/
+    options[:install] = true
+  when /^gem/
+    options[:gem_for] = params
+  when /^bin/
+    options[:bin_for] = params
+  end
+end
+
+if options[:gem_for] || options[:bin_for]
+  puts gb.info(options)
+elsif options[:install]
   gb.install
 else
   gb.generate

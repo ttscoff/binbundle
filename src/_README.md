@@ -1,7 +1,7 @@
-# Binbundle
+<!--README--><!--GITHUB--># Binbundle
 
 [![Gem](https://img.shields.io/gem/v/binbundle.svg)](https://rubygems.org/gems/na)
-[![GitHub license](https://img.shields.io/github/license/ttscoff/binbundle.svg)](./LICENSE.txt)
+[![GitHub license](https://img.shields.io/github/license/ttscoff/binbundle.svg)](./LICENSE.txt)<!--END GITHUB-->
 
 Creates a "bundle" file of all installed gems with executables. The resulting file is an executable script that can be run standalone, or in combination with this script to add options like `sudo` or `--user-install` to the `gem install` commands. These options can be specified when creating the file as well. A file created with `sudo` or `--user-install` commands can still be overridden when running via this script and `--install`.
 
@@ -37,7 +37,7 @@ Usage: binbundle [options] [bundle|install]
     -h, --help                       Display this screen
 ```
 
-
+<!--GITHUB-->
 
 ## Development
 
@@ -64,3 +64,4 @@ PayPal link: [paypal.me/ttscoff](https://paypal.me/ttscoff)
 ## Changelog
 
 See [CHANGELOG.md](https://github.com/ttscoff/binbundle/blob/main/CHANGELOG.md)
+<!--END GITHUB--><!--END README-->

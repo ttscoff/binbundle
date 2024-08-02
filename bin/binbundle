@@ -12,7 +12,7 @@ options = {
 }
 
 optparse = OptionParser.new do |opts|
-  opts.banner = "Usage: #{File.basename(__FILE__)} [options]"
+  opts.banner = "Usage: #{File.basename(__FILE__)} [options] [bundle|install]"
 
   opts.on('--[no-]versions', 'Include version info in output (default true)') do |opt|
     options[:include_version] = opt
@@ -39,10 +39,6 @@ optparse = OptionParser.new do |opts|
     Process.exit 0
   end
 
-  opts.on('--install', 'Run bundle script') do
-    options[:install] = true
-  end
-
   opts.on('-h', '--help', 'Display this screen') do
     puts opts
     exit
@@ -58,7 +54,7 @@ end
 
 gb = Binbundle::GemBins.new(options)
 
-options[:install] = true if ARGV.count.positive? && ARGV[0] =~ /^inst/
+options[:install] = true if ARGV.count.positive? && ARGV[0] =~ /^(inst|rest)/
 
 if options[:install]
   gb.install

@@ -55,7 +55,7 @@ Use either info command with `--local` to parse installed gems rather than a Bin
 
 ### Recommendations
 
-I recommend using Binbundle along with a tool like Dotfiles. Commit your bundle to a repo that you can easily clone to a new machine and then make `gem install binbundle` and `binbundle install ~/dotfiles/Binfile` part of your restore process.
+I recommend using Binbundle along with a tool like [Dotbot](https://github.com/anishathalye/dotbot). Commit your bundle to a repo that you can easily clone to a new machine and then make `gem install binbundle` and `binbundle install ~/dotfiles/Binfile` part of your restore process.
 
 <!--GITHUB-->
 ### Support

@@ -1,0 +1,6 @@
+= Binbundle
+
+A command line tool for bundling installed gem binaries and restoring them.
+
+
+

@@ -42,9 +42,16 @@ Usage: binbundle [options] [bundle|install]
     -s, --sudo                       Install gems with sudo
     -u, --user-install               Use --user-install to install gems
     -f, --file FILE                  Output to alternative filename (default Binfile)
+    -l, --local                      Use installed gems instead of Binfile for gem_for and bins_for
     -v, --version                    Display version
     -h, --help                       Display this screen
 ```
+
+#### Info commands
+
+You can retrieve some basic info about gems and their binaries using `binbundle gem for BIN` or `binbundle bins for GEM`. This will read `Binfile` or any file specified by `--file` and return the requested info, either the gem associated with the given binary (BIN), or the binaries associated with the given gem name (GEM).
+
+Use either info command with `--local` to parse installed gems rather than a Binfile.
 
 ### Recommendations
 

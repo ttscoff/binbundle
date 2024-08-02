@@ -10,6 +10,8 @@ require 'rubocop/rake_task'
 
 desc 'Run test suite'
 task test: %i[rubocop spec]
+
+desc 'Package gem'
 task package: %i[clobber build]
 
 RuboCop::RakeTask.new do |t|

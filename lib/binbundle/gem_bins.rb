@@ -3,6 +3,9 @@
 module Binbundle
   # Main class
   class GemBins
+    attr_writer :gem_for
+    attr_writer :bin_for
+
     def local_gems
       Gem::Specification.sort_by { |g| [g.name.downcase, g.version] }.group_by(&:name)
     end
@@ -29,7 +32,10 @@ module Binbundle
                    IO.read(@file)
                  end
 
-      gem_list = GemList.new(contents, include_version: @include_version)
+      gem_list = JewelryBox.new(contents: contents,
+                                include_version: @include_version,
+                                sudo: @sudo,
+                                user_install: @user_install)
       if options[:gem_for]
         gem_list.gem_for_bin(options[:gem_for])
       elsif options[:bin_for]
@@ -50,17 +56,10 @@ module Binbundle
       puts "Installing gems from #{@file}"
 
       contents = IO.read(@file)
-      gem_list = GemList.new(contents, include_version: @include_version)
-      lines = if @sudo
-                gem_list.sudo
-              elsif @user_install
-                gem_list.user_install
-              else
-                gem_list.normal_install
-              end
+      lines = JewelryBox.new(contents: contents, include_version: @include_version, sudo: @sudo, user_install: @user_install)
 
       if @dry_run
-        puts lines.join("\n")
+        puts lines.to_s
         Process.exit 0
       end
 
@@ -94,23 +93,16 @@ module Binbundle
       puts @errors.join("\n")
     end
 
-    def gem_command(gem, attrs)
-      ver = @include_version ? " -v '#{attrs[:version]}'" : ''
-      ui = @user_install ? '--user-install ' : ''
-      sudo = @sudo ? 'sudo ' : ''
-      "# Executables: #{attrs[:bins].join(', ')}\n#{sudo}gem install #{ui}#{gem}#{ver}"
-    end
-
     def bins_to_s
-      gems_with_bins = {}
+      gems_with_bins = JewelryBox.new(include_version: @include_version, sudo: @sudo, user_install: @user_install)
 
       @local_gems.each do |g, specs|
         versions = specs.map { |spec| spec.version.to_s }
         bins = specs.map(&:executables)
-        gems_with_bins[g] = { version: versions.max, bins: bins.sort.uniq }
+        gems_with_bins << Jewel.new(g, bins.sort.uniq, versions.max)
       end
 
-      gems_with_bins.map { |gem, attrs| gem_command(gem, attrs) }.join("\n\n")
+      gems_with_bins.map { |g| g.gem_command }.join("\n\n")
     end
 
     def generate

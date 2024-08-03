@@ -1,7 +1,7 @@
-gem install searchlink
+gem install mdless
 
-# Executables: searchlink
-sudo gem install searchlink --version '2.3.4'
+# Executables: searchlink, funkle
+sudo gem install searchlink --version '2.3.66'
 
-# Executables: searchlink
-gem install --user-install searchlink
+# Executables: bargle
+gem install --user-install bargle_funk

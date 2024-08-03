@@ -7,6 +7,7 @@ require 'rdoc/task'
 require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
 require 'rubocop/rake_task'
+require 'yard'
 
 desc 'Run test suite'
 task test: %i[rubocop spec]
@@ -24,6 +25,12 @@ Rake::RDocTask.new do |rd|
   rd.main = 'README.rdoc'
   rd.rdoc_files.include('README.rdoc', 'lib/**/*.rb', 'bin/**/*')
   rd.title = 'binbundle'
+end
+
+YARD::Rake::YardocTask.new do |t|
+  t.files = ["lib/binbundle/*.rb"]
+  t.options = ["--markup-provider=redcarpet", "--markup=markdown", "--no-private", "-p", "yard_templates"]
+  # t.stats_options = ['--list-undoc']
 end
 
 desc 'Development version check'

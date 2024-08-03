@@ -6,7 +6,8 @@ require 'tty-spinner'
 require 'english'
 require_relative 'binbundle/version'
 require_relative 'binbundle/prompt'
-require_relative 'binbundle/gem_list'
+require_relative 'binbundle/jewel'
+require_relative 'binbundle/jewelry_box'
 require_relative 'binbundle/gem_bins'
 
 module Binbundle

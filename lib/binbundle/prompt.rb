@@ -23,7 +23,7 @@ module Binbundle
                 end
 
       # if this isn't an interactive shell, answer default
-      return default unless $stdout.isatty
+      return default if !$stdout.isatty || ENV['TESTING'] == 'true'
 
       # clear the buffer
       if ARGV&.length

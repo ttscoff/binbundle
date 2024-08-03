@@ -1,11 +1,6 @@
 # frozen_string_literal: true
+`gem rdoc binbundle --ri`
 
-IRB.conf[:AUTO_INDENT] = true
-
-require "irb/completion"
-require_relative "lib/binbundle"
-
+# rubocop:disable Style/MixinUsage
 include Binbundle # standard:disable all
-
-require "awesome_print"
-AwesomePrint.irb!
+# rubocop:enable Style/MixinUsage

@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'binbundle'
-
 unless ENV['CI'] == 'true'
   # SimpleCov::Formatter::Codecov # For CI
   require 'simplecov'
   SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
   SimpleCov.start
 end
+
+require 'binbundle'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -24,7 +24,7 @@ end
 def defaults
   {
     bin_for: nil,
-    dry_run: false,
+    dry_run: true,
     file: 'spec/gemlist.txt',
     gem_for: nil,
     include_version: true,

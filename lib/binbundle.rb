@@ -10,7 +10,9 @@ require_relative 'binbundle/jewel'
 require_relative 'binbundle/jewelry_box'
 require_relative 'binbundle/gem_bins'
 
+# Parent module
 module Binbundle
+  # StandardError class
   class Error < StandardError; end
   # Your code goes here...
 end

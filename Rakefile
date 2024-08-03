@@ -28,8 +28,8 @@ Rake::RDocTask.new do |rd|
 end
 
 YARD::Rake::YardocTask.new do |t|
-  t.files = ["lib/binbundle/*.rb"]
-  t.options = ["--markup-provider=redcarpet", "--markup=markdown", "--no-private", "-p", "yard_templates"]
+  t.files = ['lib/binbundle/*.rb']
+  t.options = ['--markup-provider=redcarpet', '--markup=markdown', '--no-private', '-p', 'yard_templates']
   # t.stats_options = ['--list-undoc']
 end
 

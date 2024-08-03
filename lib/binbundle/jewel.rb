@@ -18,7 +18,16 @@ module Binbundle
     # Gem name
     attr_reader :gem
 
-    def initialize(gem_name, bins, version)
+    ##
+    ## Create a new Jewel object
+    ##
+    ## @param      gem_name  [String] The gem name
+    ## @param      bins      [Array|String] The executables
+    ## @param      version   [String] The semantic version
+    ##
+    ## @return     [Jewel] new jewel object
+    ##
+    def initialize(gem_name = '', bins = [], version = nil)
       @gem = gem_name
       @bins = if bins.is_a?(String)
                 bins.split(/ *, */)
@@ -29,6 +38,11 @@ module Binbundle
       @include_version = true
     end
 
+    ##
+    ## Output Jewel as command
+    ##
+    ## @return     [String] Command representation of the object.
+    ##
     def to_s
       version = @include_version && @version ? " -v '#{@version}'" : ''
       if @sudo
@@ -40,11 +54,16 @@ module Binbundle
       end
     end
 
+    ##
+    ## Output a Binfile-ready version of the Jewel
+    ##
+    ## @return     [String] Binfile string
+    ##
     def gem_command
       ver = @include_version ? " -v '#{@version}'" : ''
       ui = @user_install ? '--user-install ' : ''
       sudo = @sudo ? 'sudo ' : ''
-      "# Executables: #{@bins.join(', ')}\n#{sudo}gem install #{ui}#{@gem}#{ver}"
+      "# Executables: #{@bins.join(', ')}\n#{to_s}"
     end
   end
 end

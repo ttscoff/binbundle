@@ -7,7 +7,7 @@ RSpec.describe Binbundle::JewelryBox do
 
   describe '.new' do
     it 'to be a JewelryBox' do
-      expect(jb).to be_a(Binbundle::JewelryBox)
+      expect(jb).to be_a(described_class)
     end
   end
 

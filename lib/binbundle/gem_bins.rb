@@ -3,23 +3,43 @@
 module Binbundle
   # Main class
   class GemBins
+    # Get gem for bin :gem_for
     attr_writer :gem_for
+
+    # Get bins for gem :bin_for
     attr_writer :bin_for
 
-    def local_gems
-      Gem::Specification.sort_by { |g| [g.name.downcase, g.version] }.group_by(&:name)
-    end
+    # Set options (for testing)
+    attr_writer :file
 
+    ##
+    ## Create a new GemBins object
+    ##
+    ## @param      options  The options
+    ## @option options [Boolean] :include_version Include version number in output
+    ## @option options [Boolean] :sudo Include sudo in output
+    ## @option options [Boolean] :user_install Include --user-install in output
+    ## @option options [Boolean] :dry_run Output to STDOUT
+    ## @option options [String] :file File to parse
+    ## @option options [Boolean] :local Work from local gems instead of Binfile
+    ##
     def initialize(options = {})
       @include_version = options[:include_version] || false
       @user_install = options[:user_install]
       @sudo = options[:sudo]
       @dry_run = options[:dry_run]
       @file = File.expand_path(options[:file])
-
-      @local_gems = local_gems.delete_if { |_, specs| specs.delete_if { |spec| spec.executables.empty? }.empty? }
     end
 
+    ##
+    ## Retrieve info (bin_for or gem_for)
+    ##
+    ## @param      options  The options
+    ## @option options [Boolean] :local Work from local gems instead of Binfile
+    ## @option options [String] :gem_for Find gem for this binary
+    ## @option options [String] :bin_for Find bins for this gem
+    ##
+    ## @return [String] resulting gem or bins
     def info(options)
       unless File.exist?(@file) || options[:local]
         puts "File #{@file} not found"
@@ -43,6 +63,9 @@ module Binbundle
       end
     end
 
+    ##
+    ## Install all gems in Binfile
+    ##
     def install
       unless File.exist?(@file)
         puts "File #{@file} not found"
@@ -56,10 +79,11 @@ module Binbundle
       puts "Installing gems from #{@file}"
 
       contents = IO.read(@file)
-      lines = JewelryBox.new(contents: contents, include_version: @include_version, sudo: @sudo, user_install: @user_install)
+      lines = JewelryBox.new(contents: contents, include_version: @include_version, sudo: @sudo,
+                             user_install: @user_install)
 
       if @dry_run
-        puts lines.to_s
+        puts lines
         Process.exit 0
       end
 
@@ -93,18 +117,18 @@ module Binbundle
       puts @errors.join("\n")
     end
 
+    ##
+    ## Output all gems as Binfile format
+    ##
+    ## @return     [String] Binfile format
+    ##
     def bins_to_s
-      gems_with_bins = JewelryBox.new(include_version: @include_version, sudo: @sudo, user_install: @user_install)
-
-      @local_gems.each do |g, specs|
-        versions = specs.map { |spec| spec.version.to_s }
-        bins = specs.map(&:executables)
-        gems_with_bins << Jewel.new(g, bins.sort.uniq, versions.max)
-      end
-
-      gems_with_bins.map { |g| g.gem_command }.join("\n\n")
+      local_gems.map(&:gem_command).join("\n\n")
     end
 
+    ##
+    ## Output or write Binfile
+    ##
     def generate
       output = bins_to_s
 
@@ -115,6 +139,9 @@ module Binbundle
       end
     end
 
+    ##
+    ## Writes to Binfile
+    ##
     def write_file(output)
       if File.exist?(@file)
         res = Prompt.yn("#{@file} already exists, overwrite", default_response: false)
@@ -135,6 +162,25 @@ module Binbundle
 
       FileUtils.chmod 0o777, @file
       puts 'Made file executable'
+    end
+
+    private
+
+    ##
+    ## Find local gems and group by name
+    ##
+    ## @return     [Array] array of local gems as Hashes
+    ##
+    def local_gems
+      gems_with_bins = JewelryBox.new(include_version: @include_version, sudo: @sudo, user_install: @user_install)
+
+      all = Gem::Specification.sort_by { |g| [g.name.downcase, g.version] }.group_by(&:name)
+      all.delete_if { |_, specs| specs.delete_if { |spec| spec.executables.empty? }.empty? }
+      all.each do |g, specs|
+        gems_with_bins << Jewel.new(g, specs.last.executables.sort.uniq, specs.last.version.to_s)
+      end
+
+      gems_with_bins
     end
   end
 end

@@ -101,9 +101,14 @@ module Binbundle
         Process.exit 0
       end
 
+      spinner = TTY::Spinner.new("[:spinner] Validating #{total} gems remotely ...", hide_cursor: true, format: :dots_2)
+      spinner.auto_spin
+
       lines.delete_if { |g| !valid?(g.gem) }
       bad = total - lines.count
       if bad.positive?
+        spinner.error
+        spinner.stop
         puts "Failed to find #{bad} gems remotely or locally, skipping"
         total = lines.count
 
@@ -111,6 +116,9 @@ module Binbundle
           puts "No gems left to install, some not found"
           Process.exit 1
         end
+      else
+        spinner.success
+        spinner.stop
       end
 
       `sudo echo -n ''` if @sudo

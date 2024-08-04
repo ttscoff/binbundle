@@ -1,11 +1,11 @@
 ### 1.0.10
 
-2024-08-04 06:48
+2024-08-04 13:00
 
 #### IMPROVED
 
-- Code refactoring, tests
-- More tests, more fixes
+- When installing, test if the gem/version is already installed and skip
+- When installing, verify that the specified gem exists on the host before running the install command. Adds a pause before execution, but saves a lot of time looking up missing gems.
 
 ### 1.0.9
 

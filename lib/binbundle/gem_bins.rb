@@ -10,7 +10,7 @@ module Binbundle
     attr_writer :bin_for
 
     # Set options (for testing)
-    attr_writer :file
+    attr_writer :file, :dry_run
 
     ##
     ## Create a new GemBins object
@@ -72,15 +72,17 @@ module Binbundle
         Process.exit 1
       end
 
-      res = Prompt.yn("Install gems from #{File.basename(@file)}", default_response: true)
-
-      Process.exit 0 unless res
-
-      puts "Installing gems from #{@file}"
-
       contents = IO.read(@file)
       lines = JewelryBox.new(contents: contents, include_version: @include_version, sudo: @sudo,
                              user_install: @user_install)
+
+      total = lines.count
+      successes = 0
+      failures = 0
+      res = Prompt.yn("Install #{total} gems from #{File.basename(@file)}", default_response: true)
+      Process.exit 0 unless res
+
+      puts "Installing gems from #{@file}"
 
       if @dry_run
         puts lines
@@ -102,19 +104,24 @@ module Binbundle
         result = $CHILD_STATUS.success?
 
         if result
+          successes += 1
           spinner.success
           spinner.stop
         else
+          failures += 1
           spinner.error
           spinner.stop
           @errors << output
         end
       end
 
+      puts "Total #{total}, installed: #{successes}, #{failures} errors."
+
       return if @errors.empty?
 
       puts 'ERRORS:'
       puts @errors.join("\n")
+      Process.exit 1
     end
 
     ##

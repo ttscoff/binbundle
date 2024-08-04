@@ -1,3 +1,12 @@
+### 1.0.10
+
+2024-08-04 06:48
+
+#### IMPROVED
+
+- Code refactoring, tests
+- More tests, more fixes
+
 ### 1.0.9
 
 2024-08-02 10:42

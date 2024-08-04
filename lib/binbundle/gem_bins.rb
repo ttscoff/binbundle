@@ -77,8 +77,20 @@ module Binbundle
                              user_install: @user_install)
 
       total = lines.count
+      lines.delete_if { |l| installed?(l.gem, l.version) }
+      installed = total - lines.count
+      if installed.positive?
+        puts "#{installed} gems already installed, skipping"
+        total = lines.count
+      end
+
       successes = 0
       failures = 0
+      if total.zero?
+        puts "All gems already installed"
+        Process.exit 0
+      end
+
       res = Prompt.yn("Install #{total} gems from #{File.basename(@file)}", default_response: true)
       Process.exit 0 unless res
 
@@ -87,6 +99,18 @@ module Binbundle
       if @dry_run
         puts lines
         Process.exit 0
+      end
+
+      lines.delete_if { |g| !valid?(g.gem) }
+      bad = total - lines.count
+      if bad.positive?
+        puts "Failed to find #{bad} gems remotely or locally, skipping"
+        total = lines.count
+
+        if total.zero?
+          puts "No gems left to install, some not found"
+          Process.exit 1
+        end
       end
 
       `sudo echo -n ''` if @sudo
@@ -169,6 +193,25 @@ module Binbundle
 
       FileUtils.chmod 0o777, @file
       puts 'Made file executable'
+    end
+
+    def valid?(gem_name)
+      !Gem.latest_version_for(gem_name).nil?
+    end
+
+    def installed?(gem_name, version = nil)
+      selected = local_gems.select do |g|
+        if g.gem == gem_name
+          if version && @include_version
+            g.version == version
+          else
+            true
+          end
+        else
+          false
+        end
+      end
+      selected.count.positive?
     end
 
     private

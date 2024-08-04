@@ -34,11 +34,11 @@ RSpec.describe Binbundle::GemBins do
   end
 
   describe '.install' do
-    # it 'installs tests' do
-    #   ENV['TESTING'] = 'true'
-    #   jb.dry_run = false
-    #   expect { jb.install }.to raise_error(SystemExit)
-    # end
+    it 'installs tests' do
+      ENV['TESTING'] = 'true'
+      jb.dry_run = false
+      expect { jb.install }.to raise_error(SystemExit)
+    end
 
     it 'fails on missing file' do
       jb.file = 'non_existent.txt'

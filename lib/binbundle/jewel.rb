@@ -18,6 +18,9 @@ module Binbundle
     # Gem name
     attr_reader :gem
 
+    # Version
+    attr_reader :version
+
     ##
     ## Create a new Jewel object
     ##

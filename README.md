@@ -31,7 +31,12 @@ Example:
 
     binbundle install --no-versions --user-install --file ~/dotfiles/Binfile
 
-You can also run with subcommands `bundle` or `install`, e.g. `bundle_gem_bins install`.
+The available subcommands are:
+
+- `bundle`: create a new Binfile (or specified --file)
+- `install`: install gems from Binfile
+- `gem for EXE`: find out which gem is responsible for an executable EXE (e.g. `binbundle gem for searchlink`)
+- `bin for GEM`: find out what executables gem GEM installs (e.g. `binbundle bin for yard`)
 
 #### Options
 
